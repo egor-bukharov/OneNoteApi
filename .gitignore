@@ -1,4 +1,4 @@
-/Demo.OneNote/*.suo
+*.suo
 /Demo.OneNote/obj
 /Demo.OneNote/bin
 /Demo.OneNote.IntegrationTests/obj
