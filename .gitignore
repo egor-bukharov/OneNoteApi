@@ -3,3 +3,4 @@
 /Demo.OneNote/bin
 /Demo.OneNote.IntegrationTests/obj
 /Demo.OneNote.IntegrationTests/bin
+/Demo.OneNote.IntegrationTests/*.user
