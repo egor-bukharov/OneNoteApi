@@ -5,15 +5,15 @@ using System.IO;
 
 namespace Demo.OneNote
 {
-    public class Notebook
+    public class Section
     {
-        protected Notebook() { }
+        protected Section() { }
 
-        public static Notebook Open(string path)
+        public static Section Open(string path)
         {
             using (var stream = File.OpenRead(path))
             {
-                return new Notebook();
+                return new Section();
             }
         }
     }

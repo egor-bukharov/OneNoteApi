@@ -5,13 +5,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Demo.OneNote.IntegrationTests
 {
     [TestClass]
-    public class NotebookTests
+    public class SectionTests
     {
         [TestMethod]
         public void OpenedNotebookShouldNotBeNull()
         {
             const string relativePathToInputFile = @"TestInputFiles\OneNoteApi Demo.one";
-            var notebook = Notebook.Open(relativePathToInputFile);
+            var notebook = Section.Open(relativePathToInputFile);
 
             Assert.IsNotNull(notebook);
         }
@@ -21,7 +21,7 @@ namespace Demo.OneNote.IntegrationTests
         public void ShouldThrowAnExceptionIfFIleNotExists()
         {
             const string relativePathToInputFile = @"TestInputFiles\Not existing file.one";
-            Notebook.Open(relativePathToInputFile);
+            Section.Open(relativePathToInputFile);
         }
     }
 }
