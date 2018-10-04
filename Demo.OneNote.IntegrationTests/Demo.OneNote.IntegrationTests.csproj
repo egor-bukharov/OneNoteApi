@@ -57,6 +57,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="TestInputFiles\InvalidGuidFileFormat.one">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestInputFiles\TruncatedHeader.one">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="TestInputFiles\OneNoteApi Demo.one">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
