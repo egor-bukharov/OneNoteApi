@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace Demo.OneNote.Internal
 {
-    internal static class Interop
+    internal static class Unsafe
     {
         public static bool ReadStruct<T>(BinaryReader reader, ref T result)
         {

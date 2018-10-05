@@ -37,11 +37,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Internal\CbFormat.cs" />
+    <Compile Include="Internal\ExtendedGUID.cs" />
+    <Compile Include="Internal\FileChunkReference64x32.cs" />
     <Compile Include="Internal\FileFormat.cs" />
     <Compile Include="Internal\FileChunkReference32.cs" />
+    <Compile Include="Internal\FileNodeHeader.cs" />
+    <Compile Include="Internal\FileNodeIDs.cs" />
+    <Compile Include="Internal\FileNodeListFragment.cs" />
     <Compile Include="Internal\Header.cs" />
-    <Compile Include="Internal\Interop.cs" />
-    <Compile Include="Internal\Validator.cs" />
+    <Compile Include="Internal\StpFormat.cs" />
+    <Compile Include="Internal\Unsafe.cs" />
     <Compile Include="Section.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
