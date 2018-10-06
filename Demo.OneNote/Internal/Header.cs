@@ -3,8 +3,8 @@ using System.Runtime.InteropServices;
 
 namespace Demo.OneNote.Internal
 {
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct Header
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct Header
     {
         public Guid guidFileType;
         public Guid guidFile;
@@ -24,9 +24,9 @@ namespace Demo.OneNote.Internal
         private readonly byte fNeedsDefrag; // must be ignored
         private readonly byte fRepairedFile; // must be ignored
         private readonly byte fNeedsGarbageCollect; // must be ignored
-        private readonly bool fHasNoEmbeddedFileObjects; // must be ignored
+        private readonly byte fHasNoEmbeddedFileObjects; // must be ignored
         public Guid guidAncestor;
-        public uint crcName;
+        public uint crcName; 
         public FileChunkReference64x32 fcrHashedChunkList; // can be zero or nil
         public FileChunkReference64x32 fcrTransactionLog; // must not be zero or nil
         public FileChunkReference64x32 fcrFileNodeListRoot; // must not be zero or nil

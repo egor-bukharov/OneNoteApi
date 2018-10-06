@@ -5,15 +5,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Demo.OneNote.IntegrationTests
 {
     [TestClass]
-    public class SectionTests
+    public class SectionIntegrationTests
     {
         [TestMethod]
         public void OpenedSectionShouldNotBeNull()
         {
             const string relativePathToInputFile = @"TestInputFiles\OneNoteApi Demo.one";
-            var notebook = Section.Open(relativePathToInputFile);
+            var section = Section.Open(relativePathToInputFile);
 
-            Assert.IsNotNull(notebook);
+            Assert.IsNotNull(section);
         }
 
         [TestMethod]

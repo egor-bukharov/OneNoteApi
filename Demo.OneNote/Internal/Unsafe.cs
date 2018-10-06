@@ -1,12 +1,11 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Runtime.InteropServices;
 
 namespace Demo.OneNote.Internal
 {
     internal static class Unsafe
     {
-        public static bool ReadStruct<T>(BinaryReader reader, ref T result)
+        public static bool ReadStruct<T>(BinaryReader reader, ref T result) where T : struct 
         {
             var expectedLength = Marshal.SizeOf(typeof(T));
             var bytes = reader.ReadBytes(expectedLength);

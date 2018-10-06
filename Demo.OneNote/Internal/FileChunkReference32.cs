@@ -2,9 +2,11 @@
 
 namespace Demo.OneNote.Internal
 {
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct FileChunkReference32
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct FileChunkReference32
     {
+        private const uint NilOffset = 0xFFFFFFFF;
+
         public uint Offset;
         public uint Size;
 
@@ -12,10 +14,28 @@ namespace Demo.OneNote.Internal
         {
             if (Size == 0)
             {
-                return Offset == 0 ? "Zero" : "Nil";
+                if (Offset == 0)
+                {
+                    return "Zero";
+                }
+
+                if (Offset == NilOffset)
+                {
+                    return "Nil";
+                }
             }
 
             return string.Format("Offset: {0}, Size: {1}", Offset, Size);
+        }
+
+        public static FileChunkReference32 Zero
+        {
+            get { return new FileChunkReference32(); }
+        }
+
+        public static FileChunkReference32 Nil
+        {
+            get { return new FileChunkReference32 {Offset = NilOffset, Size = 0}; }
         }
     }
 }

@@ -46,6 +46,7 @@
     <Compile Include="Internal\FileNodeIDs.cs" />
     <Compile Include="Internal\FileNodeListFragment.cs" />
     <Compile Include="Internal\Header.cs" />
+    <Compile Include="Internal\SectionReader.cs" />
     <Compile Include="Internal\StpFormat.cs" />
     <Compile Include="Internal\Unsafe.cs" />
     <Compile Include="Section.cs" />

@@ -36,45 +36,50 @@ namespace Demo.OneNote
                 // TODO: Validate the rest of Header members
                 // ...
 
-                if (!Seek(stream, header.fcrFileNodeListRoot))
-                {
-                    throw new FormatException("FileNodeListRoot was not found");
-                }
+                //if (!Seek(stream, header.fcrFileNodeListRoot))
+                //{
+                //    throw new FormatException("FileNodeListRoot was not found");
+                //}
 
-                while (true)
-                {
-                    var fileNodeListFragmentHeader = new FileNodeListFragmentHeader();
-                    // TODO: This should be well-tested
-                    if (!Unsafe.ReadStruct(reader, ref fileNodeListFragmentHeader))
-                    {
-                        throw new FormatException("Cannot read header of FileNodeListFragment");
-                    }
+                //while (true)
+                //{
+                //    var fileNodeListFragmentHeader = new FileNodeListFragmentHeader();
+                //    // TODO: This should be well-tested
+                //    if (!Unsafe.ReadStruct(reader, ref fileNodeListFragmentHeader))
+                //    {
+                //        throw new FormatException("Cannot read header of FileNodeListFragment");
+                //    }
 
-                    // TODO: This should be well-tested
-                    // TODO: Convert magic number to a constant
-                    if (fileNodeListFragmentHeader.uintMagic != 0xA4567AB1F5F7F4C4)
-                    {
-                        throw new FormatException("FileNodeListFragment header is corrupted");
-                    }
+                //    // TODO: This should be well-tested
+                //    // TODO: Convert magic number to a constant
+                //    if (fileNodeListFragmentHeader.uintMagic != 0xA4567AB1F5F7F4C4)
+                //    {
+                //        throw new FormatException("FileNodeListFragment header is corrupted");
+                //    }
 
-                    var fileNodeHeader = new FileNodeHeader();
-                    // TODO: This should be well-tested
-                    if (!Unsafe.ReadStruct(reader, ref fileNodeHeader))
-                    {
-                        throw new FormatException("Cannot read header of FileNode");
-                    }
+                //    var fileNodeHeader = new FileNodeHeader();
+                //    // TODO: This should be well-tested
+                //    if (!Unsafe.ReadStruct(reader, ref fileNodeHeader))
+                //    {
+                //        throw new FormatException("Cannot read header of FileNode");
+                //    }
 
-                    //if (fileNodeListFragmentHeader.FileNodeListID == FileNodeIDs.ObjectSpaceManifestListReferenceFND)
-                    //{
+                    
 
-                    //}
-                    //else
-                    //{
+                //    //if (fileNodeListFragmentHeader.FileNodeListID == FileNodeIDs.ObjectSpaceManifestListReferenceFND)
+                //    //{
+
+                //    //}
+                //    //else
+                //    //{
                             
-                    //}
+                //    //}
 
-                    break;
-                }
+                //    stream.Seek(fileNodeHeader.Size, SeekOrigin.Current);
+                    
+
+                //    break;
+                //}
 
                 return new Section();
             }
@@ -87,5 +92,8 @@ namespace Demo.OneNote
 
             return actualOffset == offset;
         }
+        
+
+        
     }
 }

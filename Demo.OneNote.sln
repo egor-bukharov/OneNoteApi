@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo.OneNote", "Demo.OneNot
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo.OneNote.IntegrationTests", "Demo.OneNote.IntegrationTests\Demo.OneNote.IntegrationTests.csproj", "{78E0E4CC-7F65-4B56-8B98-7D08E059907F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo.OneNote.UnitTests", "Demo.OneNote.UnitTests\Demo.OneNote.UnitTests.csproj", "{76B7AD7D-DB0D-4F7D-9C7F-78245700C996}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{78E0E4CC-7F65-4B56-8B98-7D08E059907F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78E0E4CC-7F65-4B56-8B98-7D08E059907F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78E0E4CC-7F65-4B56-8B98-7D08E059907F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76B7AD7D-DB0D-4F7D-9C7F-78245700C996}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76B7AD7D-DB0D-4F7D-9C7F-78245700C996}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76B7AD7D-DB0D-4F7D-9C7F-78245700C996}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76B7AD7D-DB0D-4F7D-9C7F-78245700C996}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
