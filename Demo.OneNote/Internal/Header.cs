@@ -3,6 +3,8 @@ using System.Runtime.InteropServices;
 
 namespace Demo.OneNote.Internal
 {
+    // TODO: Members that must be ignored were made private and readonly
+
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct Header
     {
@@ -37,10 +39,10 @@ namespace Demo.OneNote.Internal
         public ulong nFileVersionGeneration; // must be incremented when the guidFileVersion field changes
         public Guid guidDenyReadFileVersion;
         private readonly uint grfDebugLogFlags; // must be zero and must be ignored
-        public FileChunkReference64x32 fcrDebugLog;
-        public FileChunkReference64x32 fcrAllocVerificationFreeChunkList;
-        public uint bnCreated; // should be ignored
-        public uint bnLastWroteToThisFile; // should be ignored
-        public uint bnNewestWritten; // should be ignored
+        private readonly FileChunkReference64x32 fcrDebugLog; // must be zero and must be ignored
+        private readonly FileChunkReference64x32 fcrAllocVerificationFreeChunkList; // must be zero and must be ignored
+        private readonly uint bnCreated; // should be ignored
+        private readonly uint bnLastWroteToThisFile; // should be ignored
+        private readonly uint bnNewestWritten; // should be ignored
     }
 }
