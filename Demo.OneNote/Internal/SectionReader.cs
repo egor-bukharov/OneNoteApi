@@ -1,88 +1,135 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
+using Demo.OneNote.Exceptions;
 
 namespace Demo.OneNote.Internal
 {
     public class SectionReader
     {
         public static readonly Guid FileFormatConstant = new Guid("{109ADD3F-911B-49F5-A5D0-1791EDC8AED8}");
+        public const ulong FileNodeListFragmentHeaderMagic = 0xA4567AB1F5F7F4C4;
 
-        public static readonly Guid FileTypeOne = new Guid("{7B5C52E4-D88C-4DA7-AEB1-5378D02996D3}");
-        public static readonly Guid FileTypeOnetoc2 = new Guid("{43FF2FA1-EFD9-4C76-9EE2-10EA5722765F}");
+        private readonly BinaryReader reader;
 
-        public void ReadHeader(BinaryReader reader, ref Header header)
+        public SectionReader(BinaryReader reader)
+        {
+            this.reader = reader;
+        }
+
+        public void ReadHeader(ref Header header)
         {
             if (!Unsafe.ReadStruct(reader, ref header))
             {
-                throw new FormatException("File header is truncated");
+                throw new FileFormatException("File header is truncated");
             }
 
             if (header.guidFileFormat != FileFormatConstant)
             {
-                throw new FormatException("File has an invalid format");
+                throw new FileFormatException("File has an invalid format");
             }
 
             // TODO: Validate the rest of Header members
             // ...
         }
 
-        //public static Section Open(BinaryReader reader)
-        //{
-        //    var header = new Header();
-            
+        public bool ReadFileNodeListHeader(FileChunkReference64x32 fileChunkReference64x32, ref FileNodeListHeader fileNodeListHeader)
+        {
+            Move(fileChunkReference64x32.stp);
 
-        //    if (!Seek(stream, header.fcrFileNodeListRoot))
-        //    {
-        //        throw new FormatException("FileNodeListRoot was not found");
-        //    }
+            if (!Unsafe.ReadStruct(reader, ref fileNodeListHeader))
+            {
+                throw new FileFormatException("Cannot read header of FileNodeListFragment");
+            }
 
-        //    while (true)
-        //    {
-        //        var fileNodeListFragmentHeader = new FileNodeListFragmentHeader();
-        //        // TODO: This should be well-tested
-        //        if (!Unsafe.ReadStruct(reader, ref fileNodeListFragmentHeader))
-        //        {
-        //            throw new FormatException("Cannot read header of FileNodeListFragment");
-        //        }
+            if (fileNodeListHeader.uintMagic != FileNodeListFragmentHeaderMagic)
+            {
+                throw new FileFormatException("Header of FileNodeListFragment is corrupted");
+            }
 
-        //        // TODO: This should be well-tested
-        //        // TODO: Convert magic number to a constant
-        //        if (fileNodeListFragmentHeader.uintMagic != 0xA4567AB1F5F7F4C4)
-        //        {
-        //            throw new FormatException("FileNodeListFragment header is corrupted");
-        //        }
+            return true;
+        }
 
-        //        var fileNodeHeader = new FileNodeHeader();
-        //        // TODO: This should be well-tested
-        //        if (!Unsafe.ReadStruct(reader, ref fileNodeHeader))
-        //        {
-        //            throw new FormatException("Cannot read header of FileNode");
-        //        }
+        public bool ReadFileNodeHeader(ref FileNodeHeader fileNodeHeader)
+        {
+            if (!Unsafe.ReadStruct(reader, ref fileNodeHeader))
+            {
+                throw new FileFormatException("Cannot read header of FileNode");
+            }
 
+            // TODO: Validate fileNodeHeader members
 
+            return true;
+        }
 
-        //        //if (fileNodeListFragmentHeader.FileNodeListID == FileNodeIDs.ObjectSpaceManifestListReferenceFND)
-        //        //{
+        public void ReadTransactionLog(Dictionary<uint, uint> transactionsData, uint cTransactionsInLog, uint cbTransactionLogFragmentSize)
+        {
+            uint cbRead = 0;
+            var cbMax = cbTransactionLogFragmentSize - FileChunkReference64x32.SizeInBytes;
 
-        //        //}
-        //        //else
-        //        //{
+            for (var i = 0; i < cTransactionsInLog; i++)
+            {
+                if (cbRead == cbMax)
+                {
+                    var nextFragment = new FileChunkReference64x32();
+                    ReadFileChunkReference64X32(ref nextFragment);
 
-        //        //}
+                    Move(nextFragment.stp);
 
-        //        stream.Seek(fileNodeHeader.Size, SeekOrigin.Current);
+                    cbRead = 0;
+                    cbMax = nextFragment.cb - FileChunkReference64x32.SizeInBytes;
+                }
+                else if (cbRead > cbMax)
+                {
+                    throw new FileFormatException("Transaction log is broken");
+                }
 
+                ReadTransactionFromLog(transactionsData, ref cbRead);
+            }
+        }
 
-        //        break;
-        //    }
-        //}
+        public void ReadTransactionFromLog(Dictionary<uint, uint> transactionsData, ref uint cb)
+        {
+            var transactionEntry = new TransactionEntry();
+            while (true)
+            {
+                ReadTransactionEntry(ref transactionEntry);
+                cb += TransactionEntry.SizeInBytes;
 
-        //private static bool Seek(Stream stream, FileChunkReference64x32 fileChunkReference64x32)
-        //{
-        //    var offset = (long)fileChunkReference64x32.Offset;
-        //    var actualOffset = stream.Seek(offset, SeekOrigin.Begin);
+                if (transactionEntry.srcID == TransactionEntry.SentinelEntryId)
+                {
+                    break;
+                }
 
-        //    return actualOffset == offset;
-        //}
+                transactionsData[transactionEntry.srcID] = transactionEntry.TransactionEntrySwitch;
+            }
+        }
+
+        public void ReadTransactionEntry(ref TransactionEntry transactionEntry)
+        {
+            if (!Unsafe.ReadStruct(reader, ref transactionEntry))
+            {
+                throw new FileFormatException("Cannot read transaction entry");
+            }
+        }
+
+        public void ReadFileChunkReference64X32(ref FileChunkReference64x32 fileChunkReference64x32)
+        {
+            if (!Unsafe.ReadStruct(reader, ref fileChunkReference64x32))
+            {
+                throw new FileFormatException("Cannot read reference to the next transaction log fragment");
+            }
+        }
+
+        public void Move(ulong offset)
+        {
+            reader.BaseStream.Seek((long) offset, SeekOrigin.Begin);
+        }
+
+        public void Skip(uint cb)
+        {
+            reader.BaseStream.Seek(cb, SeekOrigin.Current);
+        }
     }
 }

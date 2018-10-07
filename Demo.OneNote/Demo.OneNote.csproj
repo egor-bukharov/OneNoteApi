@@ -42,12 +42,15 @@
     <Compile Include="Internal\FileChunkReference64x32.cs" />
     <Compile Include="Internal\FileFormat.cs" />
     <Compile Include="Internal\FileChunkReference32.cs" />
+    <Compile Include="Exceptions\FileFormatException.cs" />
     <Compile Include="Internal\FileNodeHeader.cs" />
     <Compile Include="Internal\FileNodeIDs.cs" />
-    <Compile Include="Internal\FileNodeListFragment.cs" />
+    <Compile Include="Internal\FileNodeListHeader.cs" />
+    <Compile Include="Internal\FileTypeGuids.cs" />
     <Compile Include="Internal\Header.cs" />
     <Compile Include="Internal\SectionReader.cs" />
     <Compile Include="Internal\StpFormat.cs" />
+    <Compile Include="Internal\TransactionEntry.cs" />
     <Compile Include="Internal\Unsafe.cs" />
     <Compile Include="Section.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

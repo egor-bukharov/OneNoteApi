@@ -2,8 +2,8 @@
 
 namespace Demo.OneNote.Internal
 {
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct FileNodeListFragmentHeader
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct FileNodeListHeader
     {
         public ulong uintMagic; // must be "0xA4567AB1F5F7F4C4"
         public uint FileNodeListID; //  must be equal to or greater than 0x00000010

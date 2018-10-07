@@ -1,6 +1,6 @@
 ﻿namespace Demo.OneNote.Internal
 {
-    internal enum CbFormat
+    public enum CbFormat
     {
         Uncompressed4Bytes = 0,
         Uncompressed2Bytes = 1,

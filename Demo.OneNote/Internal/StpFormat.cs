@@ -1,6 +1,6 @@
 ﻿namespace Demo.OneNote.Internal
 {
-    internal enum StpFormat : byte
+    public enum StpFormat : byte
     {
         Uncompressed8Bytes = 0,
         Uncompressed4Bytes = 1,

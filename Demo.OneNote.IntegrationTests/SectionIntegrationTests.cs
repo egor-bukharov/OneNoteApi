@@ -1,5 +1,5 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
+using Demo.OneNote.Exceptions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Demo.OneNote.IntegrationTests
@@ -25,7 +25,7 @@ namespace Demo.OneNote.IntegrationTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FormatException))]
+        [ExpectedException(typeof(FileFormatException))]
         public void ShouldThrowAnExceptionIfFileHasInvalidFormat()
         {
             const string relativePathToInputFile = @"TestInputFiles\InvalidGuidFileFormat.one";
@@ -33,7 +33,7 @@ namespace Demo.OneNote.IntegrationTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FormatException))]
+        [ExpectedException(typeof(FileFormatException))]
         public void ShouldThrowAnExceptionIfFileSizeIsLessThanHeaderSize()
         {
             const string relativePathToInputFile = @"TestInputFiles\TruncatedHeader.one";
