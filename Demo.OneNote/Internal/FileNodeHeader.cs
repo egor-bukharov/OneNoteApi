@@ -5,6 +5,8 @@ namespace Demo.OneNote.Internal
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct FileNodeHeader
     {
+        public static readonly uint SizeInBytes = (uint)Marshal.SizeOf(typeof(FileNodeHeader));
+
         public uint Value;
 
         private const byte SizeBitOffset = 10;
@@ -19,17 +21,11 @@ namespace Demo.OneNote.Internal
         public uint FileNodeID
         {
             get { return Value & FileNodeIDBitMask; }
-            set
-            {
-                this.Value = (value & FileNodeIDBitMask) | (this.Value & ~FileNodeIDBitMask);
-            }
         }
 
         public uint Size
         {
             get { return (Value & SizeBitMask) >> SizeBitOffset; }
-            // TODO: See if this code can be optimized
-            set { this.Value = ((value << SizeBitOffset) & SizeBitMask) | (this.Value & ~SizeBitMask); }
         }
 
         public StpFormat StpFormat
@@ -38,7 +34,6 @@ namespace Demo.OneNote.Internal
             {
                 return (StpFormat)((Value & StpFormatBitMask) >> StpFormatBitOffset);
             }
-            set { this.Value = (((uint) value << StpFormatBitOffset) & StpFormatBitMask) | (this.Value & ~StpFormatBitMask); }
         }
 
         public CbFormat CbFormat
@@ -47,7 +42,6 @@ namespace Demo.OneNote.Internal
             {
                 return (CbFormat)((Value & CbFormatBitMask) >> CbFormatBitOffset);
             }
-            set { this.Value = (((uint)value << CbFormatBitOffset) & CbFormatBitMask) | (this.Value & ~CbFormatBitMask); }
         }
     }
 }

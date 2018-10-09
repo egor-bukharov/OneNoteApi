@@ -54,7 +54,6 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Internal\FileNodeHeaderUnitTests.cs" />
-    <Compile Include="Internal\SectionReaderUnitTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

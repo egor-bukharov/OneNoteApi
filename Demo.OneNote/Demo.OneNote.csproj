@@ -38,7 +38,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Internal\CbFormat.cs" />
-    <Compile Include="Internal\ExtendedGUID.cs" />
+    <Compile Include="Internal\CompactID.cs" />
+    <Compile Include="Internal\ExtendedGuid.cs" />
+    <Compile Include="Internal\FileChunkReference16x8.cs" />
     <Compile Include="Internal\FileChunkReference64x32.cs" />
     <Compile Include="Internal\FileFormat.cs" />
     <Compile Include="Internal\FileChunkReference32.cs" />
@@ -47,11 +49,27 @@
     <Compile Include="Internal\FileNodeIDs.cs" />
     <Compile Include="Internal\FileNodeListHeader.cs" />
     <Compile Include="Internal\FileTypeGuids.cs" />
+    <Compile Include="Internal\FNDBase.cs" />
     <Compile Include="Internal\Header.cs" />
+    <Compile Include="Internal\IFileChunkReference.cs" />
+    <Compile Include="Internal\Jcid.cs" />
+    <Compile Include="Internal\ObjectDeclaration2Body.cs" />
+    <Compile Include="Internal\ObjectDeclaration2RefCountFND.cs" />
+    <Compile Include="Internal\ObjectGroupListReferenceFND.cs" />
+    <Compile Include="Internal\ObjectSpaceManifestListReferenceFND.cs" />
+    <Compile Include="Internal\ObjectSpaceObjectPropSet.cs" />
+    <Compile Include="Internal\ObjectSpaceObjectStreamHeader.cs" />
+    <Compile Include="Internal\ObjectSpaceObjectStream.cs" />
+    <Compile Include="Internal\OneNoteFileReader.cs" />
+    <Compile Include="Internal\PropertyID.cs" />
+    <Compile Include="Internal\RevisionManifestListReferenceFND.cs" />
     <Compile Include="Internal\SectionReader.cs" />
     <Compile Include="Internal\StpFormat.cs" />
     <Compile Include="Internal\TransactionEntry.cs" />
     <Compile Include="Internal\Unsafe.cs" />
+    <Compile Include="Internal\NotSupportedFND.cs" />
+    <Compile Include="Outline.cs" />
+    <Compile Include="Page.cs" />
     <Compile Include="Section.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

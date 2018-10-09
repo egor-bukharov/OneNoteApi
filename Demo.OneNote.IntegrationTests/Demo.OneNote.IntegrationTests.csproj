@@ -54,6 +54,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Internal\SectionReaderIntegrationTests.cs" />
+    <Compile Include="Internal\OneNoteFileReaderIntegrationTests.cs" />
     <Compile Include="SectionIntegrationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -3,7 +3,7 @@
 namespace Demo.OneNote.Internal
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct FileChunkReference64x32
+    public struct FileChunkReference64x32 : IFileChunkReference
     {
         public static readonly uint SizeInBytes = (uint)Marshal.SizeOf(typeof(FileChunkReference64x32));
 
@@ -38,6 +38,20 @@ namespace Demo.OneNote.Internal
         public static FileChunkReference64x32 Nil
         {
             get { return new FileChunkReference64x32 { stp = OffsetValueOfNil, cb = 0 }; }
+        }
+
+        public long Offset
+        {
+            get { return (long) stp; }
+        }
+        public uint DataSize
+        {
+            get { return cb; }
+        }
+
+        public uint SizeOfReferenceStructure
+        {
+            get { return SizeInBytes; }
         }
     }
 }

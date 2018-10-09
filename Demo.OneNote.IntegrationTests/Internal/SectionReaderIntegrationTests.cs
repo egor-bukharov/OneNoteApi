@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
-using Demo.OneNote.Exceptions;
 using Demo.OneNote.Internal;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -11,126 +8,81 @@ namespace Demo.OneNote.IntegrationTests.Internal
     [TestClass]
     public class SectionReaderIntegrationTests
     {
-        [TestMethod]
-        public void ShouldLoadHeaderMembersProperly()
+        private Stream stream;
+        private BinaryReader binaryReader;
+        private OneNoteFileReader oneNoteFileReader;
+        private SectionReader sectionReader;
+
+        [TestInitialize]
+        public void BeforeEachTest()
         {
             const string relativePathToInputFile = @"TestInputFiles\OneNoteApi Demo.one";
-            
-            const uint expectedCrcName = 0xA944CC5C;
-            const uint expectedCTransactionsInLog = 23;
-            const ulong expectedCbFreeSpaceInFreeChunkList = 0x30;
-            const ulong expectedNFileVersionGeneration = 113;
 
-            var expectedGuidFile = new Guid("{3fb6fa02-bd3b-4f24-a393-1965548f4f77}");
-            var expectedGuidAncestor = new Guid("{cb44d324-1b38-4f25-9775-04fc94fe44f0}");
-            var expectedGuidDenyReadFileVersion = new Guid("{bbeab090-ef4e-49ef-81e3-1ab43721f73c}");
+            stream = File.OpenRead(relativePathToInputFile);
+            binaryReader = new BinaryReader(stream);
+            oneNoteFileReader = new OneNoteFileReader(binaryReader);
+            sectionReader = new SectionReader(oneNoteFileReader);
+        }
 
-            var expectedFcrHashedChunkList = new FileChunkReference64x32 { stp = 7888, cb = 1024 };
-            var expectedFcrTransactionLog = new FileChunkReference64x32 { stp = 2048, cb = 2408 };
-            var expectedFcrFileNodeListRoot = new FileChunkReference64x32 { stp = 1024, cb = 1024 };
-
-            // TODO: Move initializers and finalizers to a set-up method
-            using (var stream = File.OpenRead(relativePathToInputFile))
-            using (var reader = new BinaryReader(stream))
-            {
-                var sectionReader = new SectionReader(reader);
-
-                var header = new Header();
-                sectionReader.ReadHeader(ref header);
-
-                Assert.AreEqual(FileTypeGuids.FileTypeOne, header.guidFileType);
-                Assert.AreEqual(SectionReader.FileFormatConstant, header.guidFileFormat);
-                Assert.AreEqual(expectedGuidFile, header.guidFile);
-                Assert.AreEqual(FileFormat.One, header.ffvOldestCodeThatHasWrittenToThisFile);
-                Assert.AreEqual(FileFormat.One, header.ffvNewestCodeThatHasWrittenToThisFile);
-                Assert.AreEqual(FileFormat.One, header.ffvOldestCodeThatMayReadThisFile);
-                Assert.AreEqual(FileChunkReference32.Zero, header.fcrLegacyFreeChunkList);
-                Assert.AreEqual(expectedCTransactionsInLog, header.cTransactionsInLog);
-                Assert.AreEqual(FileChunkReference32.Nil, header.fcrLegacyFileNodeListRoot);
-                Assert.AreEqual(expectedGuidAncestor, header.guidAncestor);
-                Assert.AreEqual(expectedCrcName, header.crcName);
-                Assert.AreEqual(expectedFcrHashedChunkList, header.fcrHashedChunkList);
-                Assert.AreEqual(expectedFcrTransactionLog, header.fcrTransactionLog);
-                Assert.AreEqual(expectedFcrFileNodeListRoot, header.fcrFileNodeListRoot);
-                Assert.AreEqual(FileChunkReference64x32.Nil, header.fcrFreeChunkList);
-                Assert.AreEqual((ulong)stream.Length, header.cbExpectedFileLength);
-                Assert.AreEqual(expectedCbFreeSpaceInFreeChunkList, header.cbFreeSpaceInFreeChunkList);
-                Assert.AreNotEqual(Guid.Empty, header.guidFileVersion);
-                Assert.AreEqual(expectedNFileVersionGeneration, header.nFileVersionGeneration);
-                Assert.AreEqual(expectedGuidDenyReadFileVersion, header.guidDenyReadFileVersion);
-            }
+        [TestCleanup]
+        public void AfterEachTest()
+        {
+            binaryReader.Dispose();
+            stream.Dispose();
         }
 
         [TestMethod]
         public void ShouldReadTransactionLogProperly()
         {
-            const string relativePathToInputFile = @"TestInputFiles\OneNoteApi Demo.one";
+            var header = new Header();
+            oneNoteFileReader.ReadHeader(ref header);
 
-            using (var stream = File.OpenRead(relativePathToInputFile))
-            using (var reader = new BinaryReader(stream))
-            {
-                var sectionReader = new SectionReader(reader);
+            var transactionsData = new Dictionary<uint, uint>();
 
-                var header = new Header();
-                sectionReader.ReadHeader(ref header);
+            sectionReader.ReadTransactionLog(transactionsData, header.fcrTransactionLog, header.cTransactionsInLog);
 
-                var transactionsData = new Dictionary<uint, uint>();
+            Assert.AreEqual(15, transactionsData.Count);
 
-                sectionReader.Move(header.fcrTransactionLog.stp);
-                sectionReader.ReadTransactionLog(transactionsData, header.cTransactionsInLog, header.fcrTransactionLog.cb);
-
-                Assert.AreEqual(15, transactionsData.Count);
-
-                // TODO: Add validators for all the transactions data items
-                Assert.AreEqual((uint) 3, transactionsData[16]);
-                Assert.AreEqual((uint) 37, transactionsData[30]);
-            }
+            // TODO: Add validators for all the transactions data items
+            Assert.AreEqual((uint)3, transactionsData[16]);
+            Assert.AreEqual((uint)37, transactionsData[30]);
         }
 
         [TestMethod]
         public void ShouldLoadRootFileNodesListProperly()
         {
-            const string relativePathToInputFile = @"TestInputFiles\OneNoteApi Demo.one";
+            var header = new Header();
+            oneNoteFileReader.ReadHeader(ref header);
 
-            using (var stream = File.OpenRead(relativePathToInputFile))
-            using (var reader = new BinaryReader(stream))
+            var transactionsData = new Dictionary<uint, uint>();
+            sectionReader.ReadTransactionLog(transactionsData, header.fcrTransactionLog, header.cTransactionsInLog);
+
+            var objectSpaceManifestListNodes = sectionReader.ReadFileNodeList(header.fcrFileNodeListRoot, transactionsData, FileNodeIDs.ObjectSpaceManifestListReferenceFND);
+            foreach (var objectSpaceManifestListNode in objectSpaceManifestListNodes)
             {
-                var sectionReader = new SectionReader(reader);
+                var objectSpaceManifestListReferenceFnd = (ObjectSpaceManifestListReferenceFND) objectSpaceManifestListNode;
+                var revisionManifestListNodes = sectionReader.ReadFileNodeList(objectSpaceManifestListReferenceFnd.fileChunkReference, transactionsData, FileNodeIDs.RevisionManifestListReferenceFND);
 
-                var header = new Header();
-                sectionReader.ReadHeader(ref header);
-
-                // TODO: Enclose FileNodeListFragment enumeration into a loop
-                var fileNodeListFragmentHeader = new FileNodeListHeader();
-                sectionReader.ReadFileNodeListHeader(header.fcrFileNodeListRoot, ref fileNodeListFragmentHeader);
-
-                Assert.AreEqual((uint) 0, fileNodeListFragmentHeader.nFragmentSequence);
-                Assert.AreEqual(SectionReader.FileNodeListFragmentHeaderMagic, fileNodeListFragmentHeader.uintMagic);
-                Assert.AreEqual((uint) 0x10, fileNodeListFragmentHeader.FileNodeListID);
-
-                var fileNodeHeader = new FileNodeHeader();
-                while (true)
+                foreach (var revisionManifestListNode in revisionManifestListNodes)
                 {
-                    if (!sectionReader.ReadFileNodeHeader(ref fileNodeHeader))
+                    var revisionManifestListReferenceFnd = (RevisionManifestListReferenceFND) revisionManifestListNode;
+                    var objectGroupListNodes = sectionReader.ReadFileNodeList(
+                        revisionManifestListReferenceFnd.fileChunkReference, transactionsData,
+                        FileNodeIDs.ObjectGroupListReferenceFND);
+
+                    foreach (var objectGroupNode in objectGroupListNodes)
                     {
-                        throw new FileFormatException("Cannot read header of FileNode");
+                        var groupListReferenceFnd = (ObjectGroupListReferenceFND) objectGroupNode;
+                        var objectDeclaration2RefCountNodes = sectionReader.ReadFileNodeList(groupListReferenceFnd.fileChunkReference, transactionsData, FileNodeIDs.ObjectDeclaration2RefCountFND);
+                        foreach (var objectDeclaration2RefCountNode in objectDeclaration2RefCountNodes)
+                        {
+                            var objectDeclaration2RefCountFnd = (ObjectDeclaration2RefCountFND) objectDeclaration2RefCountNode;
+                            var propSet = sectionReader.ReadObjectSpaceObjectPropSet(objectDeclaration2RefCountFnd.blobFileChunkReference);
+                        }
                     }
-
-                    if (fileNodeHeader.FileNodeID == FileNodeIDs.ChunkTerminatorFND)
-                    {
-                        break;
-                    }
-
-                    //if (fileNodeHeader.FileNodeID != FileNodeIDs.ObjectSpaceManifestListReferenceFND)
-                    //{
-                    //    sectionReader.Skip(fileNodeHeader.Size);
-                    //}
-
-                    sectionReader.Skip(fileNodeHeader.Size - (uint) Marshal.SizeOf(fileNodeHeader));
-
-                    break;
                 }
             }
+
         }
     }
 }

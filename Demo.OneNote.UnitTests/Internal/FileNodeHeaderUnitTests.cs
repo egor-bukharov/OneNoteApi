@@ -26,30 +26,6 @@ namespace Demo.OneNote.UnitTests.Internal
 
             public void Validate()
             {
-                CreateHeaderFromPropertiesAndValidateValue();
-                CreateHeaderFromValueAndValidateProperties();
-            }
-
-            private void CreateHeaderFromPropertiesAndValidateValue()
-            {
-                var fileNodeHeader = new FileNodeHeader
-                {
-                    Size = size, 
-                    FileNodeID = fileNodeID, 
-                    StpFormat = stpFormat, 
-                    CbFormat = cbFormat
-                };
-
-                Assert.AreEqual(fileNodeID, fileNodeHeader.FileNodeID);
-                Assert.AreEqual(size, fileNodeHeader.Size);
-                Assert.AreEqual(stpFormat, fileNodeHeader.StpFormat);
-                Assert.AreEqual(cbFormat, fileNodeHeader.CbFormat);
-
-                Assert.AreEqual(value, fileNodeHeader.Value);
-            }
-
-            private void CreateHeaderFromValueAndValidateProperties()
-            {
                 var fileNodeHeader = new FileNodeHeader { Value = value };
 
                 Assert.AreEqual(value, fileNodeHeader.Value);

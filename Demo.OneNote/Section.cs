@@ -8,22 +8,17 @@ namespace Demo.OneNote
     {
         protected internal static readonly Guid FileFormat = new Guid("{109ADD3F-911B-49F5-A5D0-1791EDC8AED8}");
 
-        private Section() { }
+        public Section() { }
 
         public static Section Open(string path)
         {
             using (var stream = File.OpenRead(path))
             using (var reader = new BinaryReader(stream))
             {
-                var sectionReader = new SectionReader(reader);
-                var header = new Header();
-                sectionReader.ReadHeader(ref header);
-
-                var fileNodeListFragmentHeader = new FileNodeListHeader();
-                sectionReader.ReadFileNodeListHeader(header.fcrFileNodeListRoot, ref fileNodeListFragmentHeader);
+                var fileReader = new OneNoteFileReader(reader);
+                var sectionReader = new SectionReader(fileReader);
+                return sectionReader.ReadSection();
             }
-
-            return new Section();
         }
     }
 }
