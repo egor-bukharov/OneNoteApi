@@ -67,7 +67,7 @@
     <Compile Include="Internal\StpFormat.cs" />
     <Compile Include="Internal\TransactionEntry.cs" />
     <Compile Include="Internal\Unsafe.cs" />
-    <Compile Include="Internal\NotSupportedFND.cs" />
+    <Compile Include="Internal\NotImplementedFND.cs" />
     <Compile Include="Outline.cs" />
     <Compile Include="Page.cs" />
     <Compile Include="Section.cs" />

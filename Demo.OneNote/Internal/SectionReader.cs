@@ -148,44 +148,41 @@ namespace Demo.OneNote.Internal
                 oneNoteFileReader.ReadFileNodeHeader(ref fileNodeHeader);
                 jumpSizeToNextFragmentReference -= FileNodeHeader.SizeInBytes;
 
-                var skip = true;
-
                 var fileNodeId = fileNodeHeader.FileNodeID;
                 if (fileNodeId == FileNodeIDs.ChunkTerminatorFND)
                 {
                     break;
                 }
-                else
-                {
-                    if (fileNodeIds.Length == 0 || Array.IndexOf(fileNodeIds, fileNodeId) >= 0)
-                    {
-                        var readFileNodeData = ReadFileNodeData(fileNodeHeader, ref jumpSizeToNextFragmentReference);
-                        if (readFileNodeData == null)
-                        {
-                            readFileNodeData = new NotSupportedFND(fileNodeHeader);
-                        }
-                        else
-                        {
-                            skip = false;
-                        }
 
-                        result.Add(readFileNodeData);
-                    }
-                }
-                
-                if (skip)
+                var sizeOfData = fileNodeHeader.Size - FileNodeHeader.SizeInBytes;
+                var skip = true;
+
+                if (fileNodeIds.Length == 0 || Array.IndexOf(fileNodeIds, fileNodeId) >= 0)
                 {
-                    var sizeOfData = fileNodeHeader.Size - FileNodeHeader.SizeInBytes;
-                    if (sizeOfData != 0)
+                    var readFileNodeData = ReadFileNodeData(fileNodeHeader);
+                    if (readFileNodeData == null)
                     {
-                        oneNoteFileReader.Skip(sizeOfData);
-                        jumpSizeToNextFragmentReference -= sizeOfData;
+                        readFileNodeData = new NotImplementedFND(fileNodeHeader);
                     }
+                    else
+                    {
+                        skip = false;
+                    }
+
+                    result.Add(readFileNodeData);
+                    jumpSizeToNextFragmentReference -= sizeOfData;
+                }
+
+                if (skip && sizeOfData != 0)
+                {
+                    oneNoteFileReader.Skip(sizeOfData);
+                    jumpSizeToNextFragmentReference -= sizeOfData;
                 }
 
                 nodesCount--;
 
-                if (jumpSizeToNextFragmentReference < 4)
+                const uint minJumpSize = 4;
+                if (jumpSizeToNextFragmentReference < minJumpSize)
                 {
                     break;
                 }
@@ -202,66 +199,58 @@ namespace Demo.OneNote.Internal
             transactionsData[fileNodeListId] = nodesCount;
         }
 
-        public FNDBase ReadFileNodeData(FileNodeHeader header, ref uint jumpSizeToNextFragmentReference)
+        public FNDBase ReadFileNodeData(FileNodeHeader header)
         {
             switch (header.FileNodeID)
             {
                 case FileNodeIDs.ObjectSpaceManifestListReferenceFND:
-                    return ReadObjectSpaceManifestListReferenceFND(header, ref jumpSizeToNextFragmentReference);
+                    return ReadObjectSpaceManifestListReferenceFND(header);
                 case FileNodeIDs.RevisionManifestListReferenceFND:
-                    return ReadRevisionManifestListReferenceFND(header, ref jumpSizeToNextFragmentReference);
+                    return ReadRevisionManifestListReferenceFND(header);
                 case FileNodeIDs.ObjectGroupListReferenceFND:
-                    return ReadObjectGroupListReferenceFND(header, ref jumpSizeToNextFragmentReference);
+                    return ReadObjectGroupListReferenceFND(header);
                 case FileNodeIDs.ObjectDeclaration2RefCountFND:
-                    return ReadObjectDeclaration2RefCountFND(header, ref jumpSizeToNextFragmentReference);
+                    return ReadObjectDeclaration2RefCountFND(header);
                 default:
                     return null;
             }
         }
 
-        public ObjectSpaceManifestListReferenceFND ReadObjectSpaceManifestListReferenceFND(FileNodeHeader header, ref uint jumpSizeToNextFragmentReference)
+        public ObjectSpaceManifestListReferenceFND ReadObjectSpaceManifestListReferenceFND(FileNodeHeader header)
         {
             var fileChunkReference = oneNoteFileReader.ReadFileChunkReference(header.StpFormat, header.CbFormat, "ObjectSpaceManifestListReferenceFND.ref");
-            jumpSizeToNextFragmentReference -= fileChunkReference.SizeOfReferenceStructure;
 
             var gosid = new ExtendedGuid();
             oneNoteFileReader.ReadExtendedGuid(ref gosid, "ObjectSpaceManifestListReferenceFND.gosid");
-            jumpSizeToNextFragmentReference -= ExtendedGuid.SizeInBytes;
 
             return new ObjectSpaceManifestListReferenceFND(header, fileChunkReference, gosid);
         }
 
-        public RevisionManifestListReferenceFND ReadRevisionManifestListReferenceFND(FileNodeHeader header, ref uint jumpSizeToNextFragmentReference)
+        public RevisionManifestListReferenceFND ReadRevisionManifestListReferenceFND(FileNodeHeader header)
         {
             var fileChunkReference = oneNoteFileReader.ReadFileChunkReference(header.StpFormat, header.CbFormat, "RevisionManifestListReferenceFND.ref");
-            jumpSizeToNextFragmentReference -= fileChunkReference.SizeOfReferenceStructure;
 
             return new RevisionManifestListReferenceFND(header, fileChunkReference);
         }
 
-        public ObjectGroupListReferenceFND ReadObjectGroupListReferenceFND(FileNodeHeader header, ref uint jumpSizeToNextFragmentReference)
+        public ObjectGroupListReferenceFND ReadObjectGroupListReferenceFND(FileNodeHeader header)
         {
             var fileChunkReference = oneNoteFileReader.ReadFileChunkReference(header.StpFormat, header.CbFormat, "ObjectSpaceManifestListReferenceFND.ref");
-            jumpSizeToNextFragmentReference -= fileChunkReference.SizeOfReferenceStructure;
 
             var objectGroupID = new ExtendedGuid();
             oneNoteFileReader.ReadExtendedGuid(ref objectGroupID, "ObjectSpaceManifestListReferenceFND.objectGroupID");
-            jumpSizeToNextFragmentReference -= ExtendedGuid.SizeInBytes;
 
             return new ObjectGroupListReferenceFND(header, fileChunkReference, objectGroupID);
         }
 
-        public ObjectDeclaration2RefCountFND ReadObjectDeclaration2RefCountFND(FileNodeHeader header, ref uint jumpSizeToNextFragmentReference)
+        public ObjectDeclaration2RefCountFND ReadObjectDeclaration2RefCountFND(FileNodeHeader header)
         {
             var fileChunkReference = oneNoteFileReader.ReadFileChunkReference(header.StpFormat, header.CbFormat, "ObjectDeclaration2RefCountFND.BlobRef");
-            jumpSizeToNextFragmentReference -= fileChunkReference.SizeOfReferenceStructure;
 
             var body = new ObjectDeclaration2Body();
             oneNoteFileReader.ReadObjectDeclaration2Body(ref body);
-            jumpSizeToNextFragmentReference -= ObjectDeclaration2Body.SizeInBytes;
 
             var cRef = oneNoteFileReader.ReadByte();
-            jumpSizeToNextFragmentReference--;
 
             return new ObjectDeclaration2RefCountFND(header, fileChunkReference, body, cRef);
         }
